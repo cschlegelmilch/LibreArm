@@ -4,6 +4,7 @@ import SwiftUI
 struct LibreArmApp: App {
     @StateObject private var health = Health()
     @StateObject private var bp = BPClient()
+    @StateObject private var scale = QardioBaseClient()
     @StateObject private var coffee = CoffeeSupport(observeTransactions: {
 #if DEBUG
         // Unit tests own their StoreKit observers and simulated transactions.
@@ -18,6 +19,7 @@ struct LibreArmApp: App {
             ContentView()
                 .environmentObject(health)
                 .environmentObject(bp)
+                .environmentObject(scale)
                 .environmentObject(coffee)
         }
     }

@@ -162,18 +162,23 @@ final class HealthTests: XCTestCase {
     }
 }
 
-private final class FakeHealthStore: HealthStore {
+final class FakeHealthStore: HealthStore {
     private(set) var savedObjects: [HKObject] = []
     private let failAtSaveIndex: Int?
+    private let failingSampleTypes: Set<HKSampleType>
 
-    init(failAtSaveIndex: Int? = nil) {
+    init(failAtSaveIndex: Int? = nil, failingSampleTypes: Set<HKSampleType> = []) {
         self.failAtSaveIndex = failAtSaveIndex
+        self.failingSampleTypes = failingSampleTypes
     }
 
     func requestAuthorization(toShare: Set<HKSampleType>, read: Set<HKObjectType>) async throws {}
 
     func save(_ object: HKObject) async throws {
         if savedObjects.count == failAtSaveIndex {
+            throw NSError(domain: "HealthTests", code: 1)
+        }
+        if let sample = object as? HKSample, failingSampleTypes.contains(sample.sampleType) {
             throw NSError(domain: "HealthTests", code: 1)
         }
         savedObjects.append(object)
